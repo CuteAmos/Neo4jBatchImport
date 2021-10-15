@@ -1,5 +1,6 @@
 package com.adtdata.neo4j.task;
 
+import com.adtdata.neo4j.constants.LabelConstant;
 import com.adtdata.neo4j.csv.model.CompanyNeModel;
 import com.adtdata.neo4j.dao.CompanyDao;
 import com.adtdata.neo4j.domain.Company;
@@ -32,6 +33,6 @@ public class CompanyNeTask implements Callable<ResultVo> {
         List<Company> companies = companyService.selectNoEntityCompany(param);
         CompanyNeModel companyNeModel = new CompanyNeModel(param.getStart(),param.getEnd(),companies);
         companyNeModel.produce();
-        return new ResultVo("company-ne",param.getStart(),param.getEnd(),companies.size(),"SUCCESS");
+        return new ResultVo(LabelConstant.COMPANY_NE.getLabel(),param.getStart(),param.getEnd(),companies.size(),"SUCCESS");
     }
 }

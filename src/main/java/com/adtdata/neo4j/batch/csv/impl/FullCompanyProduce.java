@@ -1,7 +1,7 @@
 package com.adtdata.neo4j.batch.csv.impl;
 
 import com.adtdata.neo4j.batch.csv.AbstractFullProduceCsv;
-import com.adtdata.neo4j.dao.CompanyDao;
+import com.adtdata.neo4j.constants.LabelConstant;
 import com.adtdata.neo4j.query.Param;
 import com.adtdata.neo4j.service.CompanyService;
 import com.adtdata.neo4j.task.CompanyTask;
@@ -25,21 +25,16 @@ public class FullCompanyProduce extends AbstractFullProduceCsv {
 
 
     @Override
-    public void init(Param param) {
-        super.init(param);
-        if(param.getStart() <= param.getEnd()){
-            start = 0;
-            end = companyService.selectCompanyMaxId();
-        }else{
-            start = param.getStart();
-            end = param.getEnd();
-        }
+    public void init() {
+        super.init();
+        start = 0;
+        end = companyService.selectCompanyMaxId();
     }
 
     @Override
     public void clear(String rootPath) {
         super.clear(rootPath);
-        FileUtil.deleteFileByPrefix("n-company-",new File(rootPath));
+        FileUtil.deleteDir(new File(rootPath + File.separator + LabelConstant.COMPANY.getTypeAndLabel()));
     }
 
     @Override

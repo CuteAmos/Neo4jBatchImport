@@ -10,15 +10,17 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "importer")
 public class ImporterConfig {
-    private static String defaultBatchConfig;
-    private static String defaultDatabase;
 
-    public static String getDefaultBatchConfig() {
-        return defaultBatchConfig;
+    private static String defaultDatabase;
+    private static String neo4jPath;
+
+
+    public static String getNeo4jPath() {
+        return neo4jPath;
     }
 
-    public void setDefaultBatchConfig(String defaultBatchConfig) {
-        ImporterConfig.defaultBatchConfig = defaultBatchConfig;
+    public  void setNeo4jPath(String neo4jPath) {
+        ImporterConfig.neo4jPath = neo4jPath;
     }
 
     public static String getDefaultDatabase() {

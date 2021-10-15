@@ -5,7 +5,6 @@ import com.adtdata.neo4j.batch.importer.IImporter;
 import com.adtdata.neo4j.config.CsvProduceConfig;
 import com.adtdata.neo4j.dao.CompanyDao;
 import com.adtdata.neo4j.query.Param;
-import com.adtdata.neo4j.utils.ImporterUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -29,33 +28,87 @@ class Neo4jApplicationTests {
     private IFullProduceCsv fullCompanyProduce;
 
     @Resource
+    private IFullProduceCsv fullPersonProduce;
+
+    @Resource
+    private IFullProduceCsv fullPerson1Produce;
+
+
+    @Resource
+    private IFullProduceCsv fullGrProduce;
+
+    @Resource
+    private IFullProduceCsv fullBRProduce;
+
+
+    @Resource
+    private IFullProduceCsv fullSHProduce;
+
+    @Resource
+    private IFullProduceCsv fullNSHProduce;
+
+
+    @Resource
     private IImporter importer;
 
 
     @Test
     void contextLoads() {
-        fullCompanyNeProduce.execute(new Param());
+        fullCompanyNeProduce.execute();
     }
 
     @Test
     void testCompany() {
-        fullCompanyProduce.execute(new Param());
-    }
-
-
-    @Test
-    void testImporter() throws IOException {
-        String[] strs = new String[4];
-        strs[0] = "E:\\Idea-workspace\\neo4j\\batch-import\\sample\\batch.properties";
-        strs[1] = "E:\\data\\databases\\graph.db";
-        strs[2] = "E:\\temp\\company-ne-0-3000000-1633683661785.csv,E:\\temp\\company-ne-18000000-21000000-1633683661824.csv";
-        ImporterUtil.importer(strs);
+        fullCompanyProduce.execute();
     }
 
     @Test
-    void test() throws IOException {
+    void testPerson() {
+        fullPersonProduce.execute();
+
+    }
+
+
+
+    @Test
+    void testAll() throws InterruptedException {
+
+       /* Thread thread = new Thread(() -> fullCompanyProduce.execute());
+        thread.start();
+        Thread thread0 = new Thread(() -> fullCompanyNeProduce.execute());
+        thread0.start();
+        Thread thread1 = new Thread(() -> fullPerson1Produce.execute());
+        thread1.start();
+        Thread thread2 = new Thread(() -> fullPersonProduce.execute());
+        thread2.start();
+        Thread thread3 = new Thread(() -> fullGrProduce.execute());
+        thread3.start();
+        Thread thread4 = new Thread(() -> fullBRProduce.execute());
+        thread4.start();*/
+        Thread thread5 = new Thread(() -> fullSHProduce.execute());
+        thread5.start();
+   /*     Thread thread6 = new Thread(() -> fullNSHProduce.execute());
+        thread6.start();*/
+
+
+        while (true){
+            Thread.sleep(10000);
+        }
+
+    }
+
+
+
+    @Test
+    void importer()  {
         importer.importer();
     }
+
+    @Test
+    void testRestart() {
+        importer.restart();
+    }
+
 
 
 

@@ -6,12 +6,21 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://db02.dev:3306/COMPANY?useUnicode=true&characterEncoding=utf8&useSSL=false
-    username: root
-    password: Dataadt123!
-#    url: jdbc:mysql://dbmaster.prod:3308/COMPANY?useUnicode=true&characterEncoding=utf8&useSSL=false
-#    username: NEO4JIMPORT
-#    password: Neo4JIMPOrT18,
+    #    url: jdbc:mysql://db02.dev:3306/COMPANY?useUnicode=true&characterEncoding=utf8&useSSL=false
+    #    username: root
+    #    password: Dataadt123!
+    url: jdbc:mysql://101.200.166.134:3308/COMPANY?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: LIUQQUERY
+    password: LIUQQUERY156,
+  redis:
+    host: 192.168.131.110
+    port: 8001
+    timeout: 30000
+    password:
+
+
+
+
 
 logging:
   config: classpath:log/logback.xml
@@ -21,12 +30,15 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+
+
 csv:
-  root-path: 'E:\temp'
-  step-size: 3000000
+  root-path: E:\temp
+  step-size: 10000
   multithreading: true
-  thread-count: 3
+  thread-count: 10
+  head-path: E:\temp\head
 
 importer:
-  default-batch-config: 'E:\Idea-workspace\neo4j\batch-import\sample\batch.properties'
-  default-database: 'E:\data\databases\graph.db'
+  default-database: graph.db
+  neo4j-path: F:\DevelopmentEnvironment\neo4j\neo4j-community-3.5.28

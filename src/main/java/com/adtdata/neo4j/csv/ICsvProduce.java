@@ -12,7 +12,7 @@ public interface ICsvProduce {
 
     File createCsv();
 
-    void writeCsvHead();
+    String getCsvHead();
 
     void writeCsvContent();
 

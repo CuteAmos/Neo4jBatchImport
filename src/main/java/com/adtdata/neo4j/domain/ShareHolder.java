@@ -20,6 +20,26 @@ public class ShareHolder {
 
     private Long newComId;
 
+    private double cap;
+
+    private int type;
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public double getCap() {
+        return cap;
+    }
+
+    public void setCap(double cap) {
+        this.cap = cap;
+    }
+
     public Long getNewComId() {
         return newComId;
     }

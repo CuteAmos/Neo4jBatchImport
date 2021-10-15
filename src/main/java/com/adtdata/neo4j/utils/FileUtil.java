@@ -13,6 +13,25 @@ public class FileUtil {
         return file.delete();
     }
 
+    public static boolean renameFile(String from, String to){
+        File fromFile = new File(from);
+        File toFile = new File(to);
+        if(fromFile.exists()){
+            if(toFile.exists()){
+                if(toFile.isDirectory()){
+                    deleteDir(toFile);
+                }else{
+                    deleteFile(toFile);
+                }
+            }
+            return fromFile.renameTo(toFile);
+        }else{
+            return false;
+        }
+    }
+
+
+
     public static boolean deleteDir(File file){
         if(file.isDirectory()){
             for (File listFile : file.listFiles()) {

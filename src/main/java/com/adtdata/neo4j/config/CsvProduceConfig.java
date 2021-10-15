@@ -14,7 +14,15 @@ public class CsvProduceConfig {
     private static Integer stepSize;
     private static Boolean multithreading;
     private static Integer threadCount;
+    private static String headPath;
 
+    public static String getHeadPath() {
+        return headPath;
+    }
+
+    public void setHeadPath(String headPath) {
+        CsvProduceConfig.headPath = headPath;
+    }
 
     public static String getRootPath() {
         return rootPath;

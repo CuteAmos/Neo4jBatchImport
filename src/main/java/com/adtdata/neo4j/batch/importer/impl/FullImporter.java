@@ -4,12 +4,14 @@ import com.adtdata.neo4j.batch.importer.IImporter;
 import com.adtdata.neo4j.config.CsvProduceConfig;
 import com.adtdata.neo4j.config.ImporterConfig;
 import com.adtdata.neo4j.utils.FileUtil;
-import com.adtdata.neo4j.utils.ImporterUtil;
+import com.adtdata.neo4j.utils.ShellUtil;
+import com.adtdata.neo4j.utils.StringUtil;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author aixiaobai
@@ -19,82 +21,96 @@ import java.io.IOException;
 @Scope("prototype")
 public class FullImporter implements IImporter {
 
+
     private static String rootPath;
-    private StringBuilder nodes;
-    private StringBuilder relations;
-    private String batchConfig;
+    private static String csvHead;
+    private static String neo4jPath;
+    private Map<String,String> nodes;
+    private Map<String,String> relations;
     private String database;
+    private static String tempDb = "temp.db";
 
 
 
     public void init(){
         rootPath = CsvProduceConfig.getRootPath();
-        nodes = new StringBuilder();
-        relations = new StringBuilder();
-        if(batchConfig == null || batchConfig.length() == 0){
-            batchConfig = ImporterConfig.getDefaultBatchConfig();
-        }
+        csvHead = CsvProduceConfig.getHeadPath();
+        relations = new HashMap<>();
+        nodes = new HashMap<>();
         if(database == null || database.length() == 0){
             database = ImporterConfig.getDefaultDatabase();
         }
-        clear();
+        neo4jPath = ImporterConfig.getNeo4jPath();
     }
 
-    public void clear(){
-        FileUtil.deleteFile(new File(database));
+
+    @Override
+    public void importer() {
+        init();
+        handleNodesAndRelations();
+        clear(tempDb);
+        ShellUtil.importCsv(tempDb,nodes,relations);
     }
 
     @Override
-    public void importer() throws IOException {
+    public void restart() {
         init();
+        if (ShellUtil.isRunning()) {
+            ShellUtil.stopNeo4j();
+        }
+        String databasePath = neo4jPath+File.separator+"data"+File.separator+"databases";
+        String temp = databasePath + File.separator+tempDb;
+        if(new File(temp).exists()){
+            FileUtil.renameFile(databasePath+File.separator+database,databasePath+File.separator+database+"_bak");
+            FileUtil.renameFile(databasePath+File.separator+tempDb,databasePath+File.separator+database);
+        }
+        ShellUtil.startNeo4j();
+        if (ShellUtil.isRunning()) {
+            System.out.println("neo4j is running.");
+        }
+    }
+
+
+
+
+    public void clear(String database){
+        FileUtil.deleteDir(new File(neo4jPath+File.separator+"data"+File.separator+"databases"+File.separator+database));
+    }
+
+
+
+    private void handleNodesAndRelations(){
         File file = new File(rootPath);
-        handleFile(file.listFiles());
-        String[] args = new String[4];
-        args[0] = batchConfig;
-        args[1] = database;
-        args[2] = getNodes();
-        args[3] = getRelations();
-        ImporterUtil.importer(args);
-    }
-
-
-
-
-    private void handleFile(File[]  files){
-        if(files == null || files.length == 0){
-            return;
-        }
-        for (File file : files) {
-            if(file.isDirectory()){
-                handleFile(file.listFiles());
-            }else if(file.getName().startsWith("n-")){
-                nodes.append(file.getAbsoluteFile()).append(",");
-            }else if(file.getName().startsWith("r-")){
-                relations.append(file.getAbsoluteFile()).append(",");
+        if(file.exists() && file.isDirectory()){
+            for (File listFile : file.listFiles()) {
+                if(listFile.isDirectory()){
+                    String name = listFile.getName();
+                    String childFile = getChildFile(listFile);
+                    if(!StringUtil.isEmpty(childFile)){
+                        if(name.startsWith("node_")){
+                            nodes.put(name.substring(5),csvHead+File.separator+name.substring(5)+".csv,"+childFile);
+                        }else if(name.startsWith("relation_")){
+                            relations.put(name.substring(9),csvHead+File.separator+name.substring(9)+".csv,"+childFile);
+                        }
+                    }
+                }
             }
+        }else{
+            throw new IllegalArgumentException("Can not find this path ："+rootPath);
         }
     }
 
-    public String getNodes() {
-        if(nodes.length() > 0){
-            return nodes.substring(0,nodes.length()-1);
+
+
+    public String getChildFile(File file) {
+        StringBuilder sb = new StringBuilder();
+        for (File listFile : file.listFiles()) {
+            sb.append(listFile.getAbsolutePath()).append(",");
         }
-        return nodes.toString();
-    }
-
-    public String getRelations() {
-        if(relations.length() > 0){
-            return relations.substring(0,relations.length()-1);
+        if(sb.length() > 0){
+            return sb.substring(0,sb.length() -1);
         }
-        return relations.toString();
-    }
-
-    public String getBatchConfig() {
-        return batchConfig;
-    }
-
-    public void setBatchConfig(String batchConfig) {
-        this.batchConfig = batchConfig;
+        return "";
     }
 
     public String getDatabase() {

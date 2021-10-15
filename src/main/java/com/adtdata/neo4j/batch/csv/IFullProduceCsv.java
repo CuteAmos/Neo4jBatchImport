@@ -7,5 +7,5 @@ import com.adtdata.neo4j.query.Param;
  * @date 2021/9/30 10:16
  */
 public interface IFullProduceCsv {
-    void execute(Param param);
+    void execute();
 }

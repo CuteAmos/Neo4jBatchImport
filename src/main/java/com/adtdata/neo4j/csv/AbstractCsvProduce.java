@@ -1,6 +1,7 @@
 package com.adtdata.neo4j.csv;
 
 import com.adtdata.neo4j.config.CsvProduceConfig;
+import com.adtdata.neo4j.utils.StringUtil;
 
 import java.io.*;
 import java.util.List;
@@ -16,19 +17,20 @@ public abstract class AbstractCsvProduce<T> implements ICsvProduce{
     private static String rootPath= CsvProduceConfig.getRootPath();
     private String subPath;
     private List<T> contents;
+    private String type;
+    private static String headPath = CsvProduceConfig.getHeadPath();
     protected File csvFile;
     protected FileOutputStream fos  = null;
     protected BufferedOutputStream bos = null;
 
 
-    public AbstractCsvProduce() {
-    }
 
-    public AbstractCsvProduce(long start, long end, String name, String subPath, List<T> contents) {
+    public AbstractCsvProduce(long start, long end, String name, String type, List<T> contents) {
         this.start = start;
         this.end = end;
         this.name = name;
-        this.subPath = subPath;
+        this.type = type;
+        this.subPath = this.type + "_" +name;
         this.contents = contents;
         createCsv();
     }
@@ -38,7 +40,7 @@ public abstract class AbstractCsvProduce<T> implements ICsvProduce{
             throw new NullPointerException("csvFile is null.");
         }
         try {
-            fos = new FileOutputStream(csvFile);
+            fos = new FileOutputStream(csvFile,true);
             bos = new BufferedOutputStream(fos);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -47,11 +49,13 @@ public abstract class AbstractCsvProduce<T> implements ICsvProduce{
 
     @Override
     public File createCsv() {
-        String path = rootPath;
-        if(subPath != null && subPath.length() > 0){
-            path = File.separator +subPath;
+        String path = rootPath + File.separator +subPath;
+        File pathFile = new File(path);
+        if(!pathFile.exists()){
+            pathFile.mkdirs();
         }
-        String fileName = name + "-"+start+"-"+end+"-"+ System.currentTimeMillis() +".csv";
+
+        String fileName = name + "-"+Thread.currentThread().getName()+".csv";
         File file = new File(path + File.separator + fileName);
         if(!file.exists()){
             try {
@@ -81,14 +85,22 @@ public abstract class AbstractCsvProduce<T> implements ICsvProduce{
 
     @Override
     public void produce() {
-        writeCsvHead();
-        dealData();
         writeCsvContent();
         close();
     }
 
-    public void dealData(){
-
+    @Override
+    public String getCsvHead() {
+        if(StringUtil.isEmpty(name)){
+            throw new NullPointerException("name is null.");
+        }
+        String csvHead = headPath + File.separator+name+".csv";
+        File csvHeadFile = new File(csvHead);
+        if(csvHeadFile.exists()&&csvHeadFile.isFile()){
+            return csvHeadFile.getAbsolutePath();
+        }else{
+            throw new IllegalArgumentException("Can not find this file : "+csvHead);
+        }
     }
 
     public long getStart() {
@@ -113,14 +125,6 @@ public abstract class AbstractCsvProduce<T> implements ICsvProduce{
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getSubPath() {
-        return subPath;
-    }
-
-    public void setSubPath(String subPath) {
-        this.subPath = subPath;
     }
 
     public List<T> getContents() {
