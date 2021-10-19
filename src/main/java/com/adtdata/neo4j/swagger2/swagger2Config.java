@@ -31,7 +31,7 @@ public class swagger2Config {
                 .groupName("API-TEST")
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.adt.neo4j.api"))//根据自己项目修改
+                .apis(RequestHandlerSelectors.basePackage("com.adtdata.neo4j.api"))//根据自己项目修改
                 .paths(PathSelectors.any())
                 .build()
                 /*   .host("39.96.211.58/services")*/

@@ -1,17 +1,17 @@
 server:
-  port: 8083
+  port: 13000
   servlet:
-    context-path: /neo4j
+    context-path: /neo4jimport
 
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    #    url: jdbc:mysql://db02.dev:3306/COMPANY?useUnicode=true&characterEncoding=utf8&useSSL=false
-    #    username: root
-    #    password: Dataadt123!
-    url: jdbc:mysql://101.200.166.134:3308/COMPANY?useUnicode=true&characterEncoding=utf8&useSSL=false
-    username: LIUQQUERY
-    password: LIUQQUERY156,
+    url: jdbc:mysql://dbmaster.prod:3308/COMPANY?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: NEO4JIMPORT
+    password: Neo4JIMPOrT18,
+  #    url: jdbc:mysql://101.200.166.134:3308/COMPANY?useUnicode=true&characterEncoding=utf8&useSSL=false
+  #    username: LIUQQUERY
+  #    password: LIUQQUERY156,
   redis:
     host: 192.168.131.110
     port: 8001
@@ -33,12 +33,15 @@ mybatis:
 
 
 csv:
-  root-path: E:\temp
-  step-size: 10000
+  root-path: /nas03backup/neo4j/csv/data
+  #  root-path: E:/temp
+  step-size: 20000
   multithreading: true
-  thread-count: 10
-  head-path: E:\temp\head
+  thread-count: 3
+  #  head-path: E:/temp/head
+  head-path: /nas03backup/neo4j/csv/data/head
 
 importer:
   default-database: graph.db
-  neo4j-path: F:\DevelopmentEnvironment\neo4j\neo4j-community-3.5.28
+  #  neo4j-path: F:\DevelopmentEnvironment\neo4j\neo4j-community-3.5.28
+  neo4j-path: /nas03backup/neo4j/source/neo4j-community-3.5.6

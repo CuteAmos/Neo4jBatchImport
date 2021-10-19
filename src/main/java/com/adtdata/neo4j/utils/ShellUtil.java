@@ -19,21 +19,20 @@ public class ShellUtil {
 
 
     public static String execCMD(String cmd, String[] envp, File dir) {
-        System.out.println(cmd);
+        LoggerUtil.getDebugLogger().info("CMD :" +cmd);
         try {
             Process process = Runtime.getRuntime().exec(cmd, envp, dir);
             StringBuffer sb = new StringBuffer();
-
             BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
+                LoggerUtil.getDebugLogger().info(line);
                 sb.append(line).append("\n");
             }
             process.waitFor();
             return sb.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            LoggerUtil.getDebugLogger().info("ShellUtil.execCMD fail :",e);
         }
         return "Failed";
     }

@@ -6,5 +6,5 @@ package com.adtdata.neo4j.batch.importer;
  */
 public interface IImporter {
     void importer();
-    void restart();
+    boolean restart();
 }

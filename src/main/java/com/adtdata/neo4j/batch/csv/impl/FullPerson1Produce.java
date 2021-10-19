@@ -4,8 +4,7 @@ import com.adtdata.neo4j.batch.csv.AbstractFullProduceCsv;
 import com.adtdata.neo4j.constants.LabelConstant;
 import com.adtdata.neo4j.query.Param;
 import com.adtdata.neo4j.service.CompanyService;
-import com.adtdata.neo4j.task.Person1Task;
-import com.adtdata.neo4j.task.PersonTask;
+import com.adtdata.neo4j.task.impl.Person1Task;
 import com.adtdata.neo4j.utils.FileUtil;
 import com.adtdata.neo4j.vo.ResultVo;
 import org.springframework.stereotype.Component;
@@ -25,6 +24,11 @@ public class FullPerson1Produce extends AbstractFullProduceCsv {
     private CompanyService companyService;
 
 
+    public FullPerson1Produce() {
+        super(LabelConstant.PERSON1);
+    }
+
+
     @Override
     public void init() {
         super.init();
@@ -32,11 +36,6 @@ public class FullPerson1Produce extends AbstractFullProduceCsv {
         end = companyService.selectPersonMaxId();
     }
 
-    @Override
-    public void clear(String rootPath) {
-        super.clear(rootPath);
-        FileUtil.deleteDir(new File(rootPath + File.separator + LabelConstant.PERSON1.getTypeAndLabel()));
-    }
 
     @Override
     public Callable<ResultVo> executeTask(Param param) {

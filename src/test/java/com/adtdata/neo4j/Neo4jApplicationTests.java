@@ -2,9 +2,11 @@ package com.adtdata.neo4j;
 
 import com.adtdata.neo4j.batch.csv.IFullProduceCsv;
 import com.adtdata.neo4j.batch.importer.IImporter;
+import com.adtdata.neo4j.batch.task.TotalTask;
 import com.adtdata.neo4j.config.CsvProduceConfig;
 import com.adtdata.neo4j.dao.CompanyDao;
 import com.adtdata.neo4j.query.Param;
+import com.adtdata.neo4j.utils.LoggerUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -51,6 +53,9 @@ class Neo4jApplicationTests {
     @Resource
     private IImporter importer;
 
+    @Resource
+    private TotalTask totalTask;
+
 
     @Test
     void contextLoads() {
@@ -73,7 +78,7 @@ class Neo4jApplicationTests {
     @Test
     void testAll() throws InterruptedException {
 
-       /* Thread thread = new Thread(() -> fullCompanyProduce.execute());
+        Thread thread = new Thread(() -> fullCompanyProduce.execute());
         thread.start();
         Thread thread0 = new Thread(() -> fullCompanyNeProduce.execute());
         thread0.start();
@@ -84,19 +89,39 @@ class Neo4jApplicationTests {
         Thread thread3 = new Thread(() -> fullGrProduce.execute());
         thread3.start();
         Thread thread4 = new Thread(() -> fullBRProduce.execute());
-        thread4.start();*/
+        thread4.start();
         Thread thread5 = new Thread(() -> fullSHProduce.execute());
         thread5.start();
-   /*     Thread thread6 = new Thread(() -> fullNSHProduce.execute());
-        thread6.start();*/
-
-
+        Thread thread6 = new Thread(() -> fullNSHProduce.execute());
+        thread6.start();
         while (true){
             Thread.sleep(10000);
         }
 
     }
 
+    @Test
+    void testTotalTask() throws InterruptedException {
+        totalTask.execute();
+
+        Thread.sleep(2000);
+
+        System.out.println(totalTask.isRunning());
+
+
+        Thread.sleep(2000);
+
+        totalTask.shutdownNow();
+        System.out.println(totalTask.isRunning());
+        Thread.sleep(2000);
+        System.out.println(totalTask.isRunning());
+        totalTask.execute();
+        System.out.println(totalTask.isRunning());
+
+        while (true){
+            Thread.sleep(2000);
+        }
+    }
 
 
     @Test
@@ -109,6 +134,13 @@ class Neo4jApplicationTests {
         importer.restart();
     }
 
+
+    @Test
+    void testLogger(){
+        LoggerUtil.getLogger("company").info("sssssssssssssssssssssssss");
+        LoggerUtil.getDebugLogger().info("sssssssssssssssssssssssss");
+        LoggerUtil.getDebugLogger().info("sssssssssssssssssssssssss");
+    }
 
 
 

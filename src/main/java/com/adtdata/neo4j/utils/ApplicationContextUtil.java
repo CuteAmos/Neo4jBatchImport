@@ -18,6 +18,7 @@ public class ApplicationContextUtil implements ApplicationContextAware {
         }
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         ApplicationContextUtil.applicationContext = applicationContext;
     }

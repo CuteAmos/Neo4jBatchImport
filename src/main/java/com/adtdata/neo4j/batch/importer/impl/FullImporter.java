@@ -1,9 +1,11 @@
 package com.adtdata.neo4j.batch.importer.impl;
 
 import com.adtdata.neo4j.batch.importer.IImporter;
+import com.adtdata.neo4j.batch.monitor.ProgressMonitor;
 import com.adtdata.neo4j.config.CsvProduceConfig;
 import com.adtdata.neo4j.config.ImporterConfig;
 import com.adtdata.neo4j.utils.FileUtil;
+import com.adtdata.neo4j.utils.LoggerUtil;
 import com.adtdata.neo4j.utils.ShellUtil;
 import com.adtdata.neo4j.utils.StringUtil;
 import org.springframework.context.annotation.Scope;
@@ -46,14 +48,16 @@ public class FullImporter implements IImporter {
 
     @Override
     public void importer() {
+        ProgressMonitor.setIsImporterRunning(true);
         init();
         handleNodesAndRelations();
         clear(tempDb);
         ShellUtil.importCsv(tempDb,nodes,relations);
+        ProgressMonitor.setIsImporterRunning(false);
     }
 
     @Override
-    public void restart() {
+    public boolean restart() {
         init();
         if (ShellUtil.isRunning()) {
             ShellUtil.stopNeo4j();
@@ -65,9 +69,8 @@ public class FullImporter implements IImporter {
             FileUtil.renameFile(databasePath+File.separator+tempDb,databasePath+File.separator+database);
         }
         ShellUtil.startNeo4j();
-        if (ShellUtil.isRunning()) {
-            System.out.println("neo4j is running.");
-        }
+        boolean running = ShellUtil.isRunning();
+        return running;
     }
 
 

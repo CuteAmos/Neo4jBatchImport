@@ -1,9 +1,14 @@
 package com.adtdata.neo4j.batch.csv;
 
+import com.adtdata.neo4j.batch.monitor.ProgressMonitor;
 import com.adtdata.neo4j.config.CsvProduceConfig;
+import com.adtdata.neo4j.constants.LabelConstant;
 import com.adtdata.neo4j.query.Param;
+import com.adtdata.neo4j.utils.FileUtil;
+import com.adtdata.neo4j.utils.LoggerUtil;
 import com.adtdata.neo4j.vo.ResultVo;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +26,12 @@ public abstract class AbstractFullProduceCsv implements IFullProduceCsv {
     protected static Boolean multithreading;
     protected static Integer threadCount;
     private static String rootPath;
+    protected LabelConstant labelConstant;
 
+
+    public AbstractFullProduceCsv(LabelConstant labelConstant) {
+        this.labelConstant = labelConstant;
+    }
 
     @Override
     public void execute() {
@@ -35,13 +45,16 @@ public abstract class AbstractFullProduceCsv implements IFullProduceCsv {
             tasks.add(executeTask(new Param(current, current + stepSize)));
             current += stepSize;
         }
+        ProgressMonitor.init(labelConstant.getLabel(),tasks.size());
         try {
             List<Future<ResultVo>> futures = threadPool.invokeAll(tasks);
             printLog(futures);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LoggerUtil.getDebugLogger().info("ExecutorService.invokeAll failed : ",e);
         }
     }
+
+
 
     public abstract Callable<ResultVo> executeTask(Param param);
 
@@ -55,11 +68,9 @@ public abstract class AbstractFullProduceCsv implements IFullProduceCsv {
                         ResultVo resultVo = null;
                         try {
                             resultVo = next.get();
-                            //System.out.println(Thread.currentThread().getName() + "====" + resultVo.toString());
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
+                            LoggerUtil.getDebugLogger().info("导入成功："+resultVo.toString());
+                        } catch (InterruptedException|ExecutionException e) {
+                            LoggerUtil.getDebugLogger().info("PrintLog failed : ",e);
                         }
                         iterator.remove();
                     }
@@ -89,6 +100,9 @@ public abstract class AbstractFullProduceCsv implements IFullProduceCsv {
     }
 
     public void clear(String rootPath) {
+        if(labelConstant != null){
+            FileUtil.deleteDir(new File(rootPath + File.separator + labelConstant.getTypeAndLabel()));
+        }
     }
 
     public long getEnd() {
@@ -105,5 +119,13 @@ public abstract class AbstractFullProduceCsv implements IFullProduceCsv {
 
     public void setStart(long start) {
         this.start = start;
+    }
+
+    public LabelConstant getLabelConstant() {
+        return labelConstant;
+    }
+
+    public void setLabelConstant(LabelConstant labelConstant) {
+        this.labelConstant = labelConstant;
     }
 }

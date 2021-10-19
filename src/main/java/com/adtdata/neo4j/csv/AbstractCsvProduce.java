@@ -1,6 +1,7 @@
 package com.adtdata.neo4j.csv;
 
 import com.adtdata.neo4j.config.CsvProduceConfig;
+import com.adtdata.neo4j.utils.LoggerUtil;
 import com.adtdata.neo4j.utils.StringUtil;
 
 import java.io.*;
@@ -43,7 +44,7 @@ public abstract class AbstractCsvProduce<T> implements ICsvProduce{
             fos = new FileOutputStream(csvFile,true);
             bos = new BufferedOutputStream(fos);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LoggerUtil.getDebugLogger().info(this.getClass().getName()+".init faild :",e);
         }
     }
 
@@ -61,7 +62,7 @@ public abstract class AbstractCsvProduce<T> implements ICsvProduce{
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                LoggerUtil.getDebugLogger().info("create the file : "+fileName+" fail :",e);
             }
         }
         this.csvFile = file;
@@ -79,7 +80,7 @@ public abstract class AbstractCsvProduce<T> implements ICsvProduce{
                fos.close();
            }
        }catch (IOException e){
-           e.printStackTrace();
+           LoggerUtil.getDebugLogger().info(this.getClass().getName()+".close faild :",e);
        }
     }
 

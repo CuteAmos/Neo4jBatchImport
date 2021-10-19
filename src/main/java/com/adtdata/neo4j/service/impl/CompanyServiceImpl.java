@@ -28,8 +28,6 @@ public class CompanyServiceImpl implements CompanyService {
    @Autowired
    private RedisUtil redisUtil;
 
-   private static final String COM_CAP = "COM_CAP_";
-   private static final String NO_ENTITY_KEY="NO_ENTITY_KEY_";
 
    private static final DecimalFormat fnum = new DecimalFormat("##0.00");
 
@@ -107,12 +105,6 @@ public class CompanyServiceImpl implements CompanyService {
         if(shareHolders != null){
             for (ShareHolder shareHolder : shareHolders) {
                 handleShareholder(shareHolder);
-                if(redisUtil.get(NO_ENTITY_KEY+shareHolder.getCompanyId())!= null
-                        || redisUtil.get(NO_ENTITY_KEY+shareHolder.getShareholderId()) != null){
-                    shareHolder.setType(2);
-                }else{
-                    shareHolder.setType(1);
-                }
             }
         }
 
@@ -215,7 +207,6 @@ public class CompanyServiceImpl implements CompanyService {
         if(companies != null){
             for (Company company : companies) {
                 company.setCompanyName(StringUtil.delSpecialChar(company.getCompanyName()));
-                redisUtil.set(NO_ENTITY_KEY+company.getId(),"1");
             }
         }
         return companies;
@@ -228,7 +219,7 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     private void handleShareholder(ShareHolder shareHolder){
-        String capStr = redisUtil.get(COM_CAP + shareHolder.getCompanyId());
+        String capStr = shareHolder.getCompanyCap();
         String amount = shareHolder.getAmount();
         capStr = StringUtil.getMoney(capStr);
         double cap = 0;

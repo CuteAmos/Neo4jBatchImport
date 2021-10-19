@@ -24,6 +24,17 @@ public class ShareHolder {
 
     private int type;
 
+    private String companyCap;
+
+
+    public String getCompanyCap() {
+        return companyCap;
+    }
+
+    public void setCompanyCap(String companyCap) {
+        this.companyCap = companyCap;
+    }
+
     public int getType() {
         return type;
     }
